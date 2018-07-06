@@ -1,7 +1,6 @@
 /*
-Implements EIP20 token standard: https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md
+Implements EIP20 token standard with Dauth
 .*/
-
 
 pragma solidity ^0.4.24;
 
@@ -40,7 +39,7 @@ contract EIP20Dauth is EIP20Interface, ERCDauth {
         decimals = _decimalUnits;                            // Amount of decimals for display purposes
         symbol = _tokenSymbol;                               // Set the symbol for display purposes
 
-        allowedInvokes = ["transfer", "transferFrom", "approve"];
+        allowedInvokes = ["transfer", "transferFrom", "approve"]; // Set allowed invoke methods
     }
 
     function checkAuth(address _user, string _invoke) internal returns (bool success) {
@@ -138,7 +137,7 @@ contract EIP20Dauth is EIP20Interface, ERCDauth {
         require(balances[sender] >= _value);
         balances[sender] -= _value;
         balances[_to] += _value;
-        emit Transfer(sender, _to, _value); //solhint-disable-line indent, no-unused-vars
+        emit Transfer(sender, _to, _value);
         return true;
     }
 
@@ -160,7 +159,7 @@ contract EIP20Dauth is EIP20Interface, ERCDauth {
         if (allowance < MAX_UINT256) {
             allowed[_from][sender] -= _value;
         }
-        emit Transfer(_from, _to, _value); //solhint-disable-line indent, no-unused-vars
+        emit Transfer(_from, _to, _value);
         return true;
     }
 
@@ -176,7 +175,7 @@ contract EIP20Dauth is EIP20Interface, ERCDauth {
 
     function _approve(address sender, address _spender, uint256 _value) public returns (bool success) {
         allowed[sender][_spender] = _value;
-        emit Approval(sender, _spender, _value); //solhint-disable-line indent, no-unused-vars
+        emit Approval(sender, _spender, _value);
         return true;
     }
 
