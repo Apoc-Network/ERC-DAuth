@@ -42,23 +42,17 @@ contract EIP20Dauth is EIP20Interface, ERCDauth {
         allowedInvokes = ["transfer", "transferFrom", "approve"]; // Set allowed invoke methods
     }
 
-    function checkAuth(address _user, string _invoke) internal returns (bool success) {
-        require(userAuth[_user].length > 0, "Unauthorized");
+    function verify(address _user, string _invoke) internal returns (bool success) {
+        require(userAuth[_user].isValue, "Unauthorized");
 
-        for(uint i; i < userAuth[_user].length; i++) {
-            if (userAuth[_user][i].grantee == msg.sender && now < userAuth[_user][i].expireTimestamp) {
-                for(uint j; j < userAuth[_user][i].invokes.length; j++) {
-                    if (userAuth[_user][i].invokes[j].toSlice().equals(_invoke.toSlice())) {
-                        return true;
-                    }
-                }
-            }
+        if (userAuth[_user][msg.sender].isValue && now < userAuth[_user][msg.sender].expireTimestamp) {
+            return true;
         }
 
         revert("Unauthorized");
     }
 
-    function grantAuth(address _grantee, string _invokes, uint _expireTimestamp) public returns (bool success) {
+    function grant(address _grantee, string _invokes, uint _expireTimestamp) public returns (bool success) {
         require(now < _expireTimestamp, "Invalid expire timestamp");
 
         var invokesSlice = _invokes.toSlice();
@@ -80,51 +74,35 @@ contract EIP20Dauth is EIP20Interface, ERCDauth {
 
         require(invokeParts.length > 0, "Invalid invoke methods");
 
-        bool isExistAuth = false;
-        for (uint k = 0; k < userAuth[msg.sender].length; k++) {
-            if (userAuth[msg.sender][k].grantee == _grantee) {
-                userAuth[msg.sender][k].invokes = invokeParts;
-                userAuth[msg.sender][k].expireTimestamp = _expireTimestamp;
-                userAuth[msg.sender][k].startTimestamp = now;
-                isExistAuth = true;
-                break;
-            }
+        if (userAuth[msg.sender][_grantee].isValue) {
+            userAuth[msg.sender][_grantee].invokes = invokeParts;
+            userAuth[msg.sender][_grantee].expireTimestamp = _expireTimestamp;
+            userAuth[msg.sender][_grantee].startTimestamp = now;
+        } else {
+            userAuth[msg.sender][_grantee] = AuthInfo(invokeParts, _expireTimestamp, now);
         }
 
-        if (isExistAuth == false) {
-            userAuth[msg.sender].push(AuthInfo(_grantee, invokeParts, _expireTimestamp, now));
-        }
-
-        emit GrantAuth(msg.sender, _grantee, _invokes, _expireTimestamp);
+        emit Grant(msg.sender, _grantee, _invokes, _expireTimestamp);
 
         return true;
     }
 
-    function alterAuth(address _grantee, string _invokes, uint _expireTimestamp) public returns (bool success) {
-        return grantAuth(_grantee, _invokes, _expireTimestamp);
+    function regrant(address _grantee, string _invokes, uint _expireTimestamp) public returns (bool success) {
+        return grant(_grantee, _invokes, _expireTimestamp);
     }
 
-    function deleteAuth(address _grantee) public returns (bool success) {
-        uint index;
-        bool isExistAuth = false;
-        for(uint i = 0; i < userAuth[msg.sender].length; i++){
-            if (userAuth[msg.sender][i].grantee == _grantee){
-                index = i;
-                isExistAuth = true;
-                break;
-            }
-        }
+    function revoke(address _grantee) public returns (bool success) {
+        require(userAuth[msg.sender][_grantee].isValue, "Invalid grantee");
 
-        require(isExistAuth, "Invalid grantee");
+        delete userAuth[msg.sender][_grantee];
 
-        // TODO: remove the gap and move each element manually
-        delete userAuth[msg.sender][index];
+        emit Revoke(msg.sender, _grantee);
 
-        emit DeleteAuth(msg.sender, _grantee);
+        return true;
     }
 
     function transferAgent(address _user, address _to, uint256 _value) public returns (bool success) {
-        checkAuth(_user, "transfer");
+        verify(_user, "transfer");
 
         return _transfer(_user, _to, _value);
     }
@@ -142,7 +120,7 @@ contract EIP20Dauth is EIP20Interface, ERCDauth {
     }
 
     function transferFromAgent(address _user, address _from, address _to, uint256 _value) public returns (bool success) {
-        checkAuth(_user, "transferFrom");
+        verify(_user, "transferFrom");
 
         return _transferFrom(_user, _from, _to, _value);
     }
@@ -164,7 +142,7 @@ contract EIP20Dauth is EIP20Interface, ERCDauth {
     }
 
     function approveAgent(address _user, address _spender, uint256 _value) public returns (bool success) {
-        checkAuth(_user, "approve");
+        verify(_user, "approve");
 
         return _approve(_user, _spender, _value);
     }
