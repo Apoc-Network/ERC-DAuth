@@ -43,17 +43,21 @@ contract EIP20Dauth is EIP20Interface, ERCDauth {
     }
 
     function verify(address _user, string _invoke) internal returns (bool success) {
-        require(userAuth[_user].isValue, "Unauthorized");
+        require(userAuth[_user][msg.sender].invokes.length > 0, "Unauthorized");
 
-        if (userAuth[_user][msg.sender].isValue && now < userAuth[_user][msg.sender].expireTimestamp) {
-            return true;
+        if (now < userAuth[_user][msg.sender].expireAt) {
+            for (uint i = 0; i < userAuth[_user][msg.sender].invokes.length; i++) {
+                if (userAuth[_user][msg.sender].invokes[i].toSlice().equals(_invoke.toSlice())) {
+                    return true;
+                }
+            }
         }
 
         revert("Unauthorized");
     }
 
-    function grant(address _grantee, string _invokes, uint _expireTimestamp) public returns (bool success) {
-        require(now < _expireTimestamp, "Invalid expire timestamp");
+    function grant(address _grantee, string _invokes, uint _expireAt) public returns (bool success) {
+        require(now < _expireAt, "Invalid expire timestamp");
 
         var invokesSlice = _invokes.toSlice();
         var delim = " ".toSlice();
@@ -74,25 +78,19 @@ contract EIP20Dauth is EIP20Interface, ERCDauth {
 
         require(invokeParts.length > 0, "Invalid invoke methods");
 
-        if (userAuth[msg.sender][_grantee].isValue) {
-            userAuth[msg.sender][_grantee].invokes = invokeParts;
-            userAuth[msg.sender][_grantee].expireTimestamp = _expireTimestamp;
-            userAuth[msg.sender][_grantee].startTimestamp = now;
-        } else {
-            userAuth[msg.sender][_grantee] = AuthInfo(invokeParts, _expireTimestamp, now);
-        }
+        userAuth[msg.sender][_grantee] = AuthInfo(invokeParts, _expireAt);
 
-        emit Grant(msg.sender, _grantee, _invokes, _expireTimestamp);
+        emit Grant(msg.sender, _grantee, _invokes, _expireAt);
 
         return true;
     }
 
-    function regrant(address _grantee, string _invokes, uint _expireTimestamp) public returns (bool success) {
-        return grant(_grantee, _invokes, _expireTimestamp);
+    function regrant(address _grantee, string _invokes, uint _expireAt) public returns (bool success) {
+        return grant(_grantee, _invokes, _expireAt);
     }
 
     function revoke(address _grantee) public returns (bool success) {
-        require(userAuth[msg.sender][_grantee].isValue, "Invalid grantee");
+        require(userAuth[msg.sender][_grantee].invokes.length > 0, "Invalid grantee");
 
         delete userAuth[msg.sender][_grantee];
 
