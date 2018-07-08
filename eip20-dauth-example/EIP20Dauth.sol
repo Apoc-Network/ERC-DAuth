@@ -99,17 +99,17 @@ contract EIP20Dauth is EIP20Interface, ERCDauth {
         return true;
     }
 
-    function transferAgent(address _user, address _to, uint256 _value) public returns (bool success) {
+    function transfer(address _to, uint256 _value) public returns (bool success) {
+        return _transfer(msg.sender, _to, _value);
+    }
+
+    function transfer(address _to, uint256 _value, address _user) public returns (bool success) {
         verify(_user, "transfer");
 
         return _transfer(_user, _to, _value);
     }
 
-    function transfer(address _to, uint256 _value) public returns (bool success) {
-        return _transfer(msg.sender, _to, _value);
-    }
-
-    function _transfer(address sender, address _to, uint256 _value) public returns (bool success) {
+    function _transfer(address sender, address _to, uint256 _value) internal returns (bool success) {
         require(balances[sender] >= _value);
         balances[sender] -= _value;
         balances[_to] += _value;
@@ -117,17 +117,17 @@ contract EIP20Dauth is EIP20Interface, ERCDauth {
         return true;
     }
 
-    function transferFromAgent(address _user, address _from, address _to, uint256 _value) public returns (bool success) {
+    function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
+        return _transferFrom(msg.sender, _from, _to, _value);
+    }
+
+    function transferFrom(address _from, address _to, uint256 _value, address _user) public returns (bool success) {
         verify(_user, "transferFrom");
 
         return _transferFrom(_user, _from, _to, _value);
     }
 
-    function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
-        return _transferFrom(msg.sender, _from, _to, _value);
-    }
-
-    function _transferFrom(address sender, address _from, address _to, uint256 _value) public returns (bool success) {
+    function _transferFrom(address sender, address _from, address _to, uint256 _value) internal returns (bool success) {
         uint256 allowance = allowed[_from][sender];
         require(balances[_from] >= _value && allowance >= _value);
         balances[_to] += _value;
@@ -139,17 +139,17 @@ contract EIP20Dauth is EIP20Interface, ERCDauth {
         return true;
     }
 
-    function approveAgent(address _user, address _spender, uint256 _value) public returns (bool success) {
+    function approve(address _spender, uint256 _value) public returns (bool success) {
+        return _approve(msg.sender, _spender, _value);
+    }
+
+    function approve(address _spender, uint256 _value, address _user) public returns (bool success) {
         verify(_user, "approve");
 
         return _approve(_user, _spender, _value);
     }
 
-    function approve(address _spender, uint256 _value) public returns (bool success) {
-        return _approve(msg.sender, _spender, _value);
-    }
-
-    function _approve(address sender, address _spender, uint256 _value) public returns (bool success) {
+    function _approve(address sender, address _spender, uint256 _value) internal returns (bool success) {
         allowed[sender][_spender] = _value;
         emit Approval(sender, _spender, _value);
         return true;
