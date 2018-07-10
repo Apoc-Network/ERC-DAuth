@@ -1,11 +1,11 @@
-/* Abstract contract for the ERC Dauth protocol: Access Delegation Standard
+/* Abstract contract for the ERC DAuth protocol: Access Delegation Standard
  * https://github.com/DIA-Network/ERC-DAuth
  * Author: Xiaoyu Wang <wxygeek@gmail.com> Bicong Wang <bicongwang@gmail.com>
  */
 
 pragma solidity ^0.4.24;
 
-contract ERCDauth {
+contract DAuthInterface {
 
     /*  Required
         AuthInfo: The struct contains user authorization information

@@ -1,15 +1,15 @@
 /*
-    Implements EIP20 token standard with Dauth
+    Implements EIP20 token standard with DAuth
 .*/
 pragma solidity ^0.4.24;
 
 import "./EIP20Interface.sol";
-import "../ERC-Dauth-Interface.sol";
+import "../ERC-DAuth-Interface.sol";
 
 import "github.com/Arachnid/solidity-stringutils/strings.sol";
 
 
-contract EIP20Dauth is EIP20Interface, ERCDauth {
+contract EIP20DAuth is EIP20Interface, DAuthInterface {
 
     using strings for *;
 
