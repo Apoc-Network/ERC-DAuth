@@ -1,45 +1,72 @@
-// Abstract contract for the ERC Dauth Access Delegation Standard
+/* Abstract contract for the ERC Dauth protocol: Access Delegation Standard
+ * https://github.com/DIA-Network/ERC-DAuth
+ * Author: Xiaoyu Wang <wxygeek@gmail.com> Bicong Wang <bicongwang@gmail.com>
+ */
+
 pragma solidity ^0.4.24;
 
 contract ERCDauth {
 
-    /* AuthInfo: User can add an AuthInfo to authorize third-party contract
-     *  - invokes: methods which third-party contract can invoke
-     *  - expireAt: the expire timestamp that the authority expires
+    /*  Required
+        AuthInfo: The struct contains user authorization information
+                 User can add an AuthInfo to authorize the client contract
+     *  - funcNames: a list of function names callable by the granted contract
+     *  - expireAt: the authorization expire timestamp in seconds
      */
     struct AuthInfo {
-        string[] invokes;
+        string[] funcNames;
         uint expireAt;
     }
 
-    // (user's address && grantee's address) -> AuthInfo
+    // Required
+    // userAuth maps (authorizer address, grantee contract address) pair to the user’s authorization AuthInfo object
     mapping(address => mapping(address => AuthInfo)) userAuth;
 
-    // all methods that can be authorized to the third-party contract
-    string[] allowedInvokes;
+    // Required
+    // All methods that are allowed other contracts to call
+    // The callable function MUST verify the grantee’s authorization
+    string[] callableFuncNames;
 
-    /// @notice check the invoke method authority for third-party contract
-    /// @param _authorizer the user address that the third-party contract agents
-    /// @param _invoke the invoke method that the third-party contract wants to access
-    /// @return Whether the authority was valid or not
+    /// Optional
+    /// @notice update the callable function list for the client contract by the resource contract's administrator
+    /// @param _invokes the invoke methods that the client contract can call
+    /// @return Whether the callableFuncNames is updated or not
+    function updateCallableFuncNames(string _invokes) public returns (bool success);
+
+    /// Required
+    /// @notice check the invoke method authority for the client contract
+    /// @param _authorizer the user address that the client contract agents
+    /// @param _invoke the invoke method that the client contract wants to call
+    /// @return Whether the grantee request is authorized or not
     function verify(address _authorizer, string _invoke) internal returns (bool success);
 
-    /// @notice authorize a third-pary contract to access the user's resource
-    /// @param _grantee the third-party contract address
-    /// @param _invokes the invoke methods that the third-party contract can access
-    /// @param _expireAt the authorization expire timestamp
+    /// Required
+    /// @notice delegate a client contract to access the user's resource
+    /// @param _grantee the client contract address
+    /// @param _invokes the callabled methods that the client contract can access
+    /// @param _expireAt the authorization expire timestamp in seconds
+    /// @return Whether the grant is successful or not
     function grant(address _grantee, string _invokes, uint _expireAt) public returns (bool success);
 
-    /// @notice alter a third-pary contract's authority
-    /// @param _grantee the third-party contract address
-    /// @param _invokes the invoke methods that the third-party contract can access
-    /// @param _expireAt the authorization expire timestamp
+    /// Optional
+    /// @notice alter a client contract's delegation
+    /// @param _grantee the client contract address
+    /// @param _invokes the callabled methods that the client contract can access
+    /// @param _expireAt the authorization expire timestamp in seconds
+    /// @return Whether the regrant is successful or not
     function regrant(address _grantee, string _invokes, uint _expireAt) public returns (bool success);
 
-    /// @notice delete a third-pary contract's authority
-    /// @param _grantee the third-party contract address
+    /// Required
+    /// @notice delete a client contract's delegation
+    /// @param _grantee the client contract address
+    /// @return Whether the revoke is successful or not
     function revoke(address _grantee) public returns (bool success);
 
+    // Required
+    // This event MUST trigger when the authorizer grant a new authorization, when grant or regrant processes successfully
     event Grant(address _authorizer, address _grantee, string _invokes, uint _expireAt);
+
+    // Required
+    // This event MUST trigger when the authorizer revoke a specific authorization successfully
     event Revoke(address _authorizer, address _grantee);
 }

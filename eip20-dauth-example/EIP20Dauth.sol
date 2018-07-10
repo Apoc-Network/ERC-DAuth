@@ -1,7 +1,6 @@
 /*
-Implements EIP20 token standard with Dauth
+    Implements EIP20 token standard with Dauth
 .*/
-
 pragma solidity ^0.4.24;
 
 import "./EIP20Interface.sol";
@@ -26,6 +25,7 @@ contract EIP20Dauth is EIP20Interface, ERCDauth {
     string public name;                   //fancy name: eg Simon Bucks
     uint8 public decimals;                //How many decimals to show.
     string public symbol;                 //An identifier: eg SBX
+    address public owner;                 //The contract owner
 
     constructor(
         uint256 _initialAmount,
@@ -38,16 +38,32 @@ contract EIP20Dauth is EIP20Interface, ERCDauth {
         name = _tokenName;                                   // Set the name for display purposes
         decimals = _decimalUnits;                            // Amount of decimals for display purposes
         symbol = _tokenSymbol;                               // Set the symbol for display purposes
+        owner = msg.sender;                                  // Set the contract owner
 
-        allowedInvokes = ["transfer", "transferFrom", "approve"]; // Set allowed invoke methods
+        callableFuncNames = ["transfer", "transferFrom", "approve"]; // Set callable functions
+    }
+
+    function updateCallableFuncNames(string _invokes) public returns (bool success) {
+        require(msg.sender == owner, "Unauthorized");
+
+        var invokesSlice = _invokes.toSlice();
+        var delim = " ".toSlice();
+        var invokeParts = new string[](invokesSlice.count(delim) + 1);
+
+        for(uint i = 0; i < invokeParts.length; i++) {
+            invokeParts[i] = invokesSlice.split(delim).toString();
+        }
+
+        callableFuncNames = invokeParts;
+        return true;
     }
 
     function verify(address _authorizer, string _invoke) internal returns (bool success) {
-        require(userAuth[_authorizer][msg.sender].invokes.length > 0, "Unauthorized");
+        require(userAuth[_authorizer][msg.sender].funcNames.length > 0, "Unauthorized");
 
         if (now < userAuth[_authorizer][msg.sender].expireAt) {
-            for (uint i = 0; i < userAuth[_authorizer][msg.sender].invokes.length; i++) {
-                if (userAuth[_authorizer][msg.sender].invokes[i].toSlice().equals(_invoke.toSlice())) {
+            for (uint i = 0; i < userAuth[_authorizer][msg.sender].funcNames.length; i++) {
+                if (userAuth[_authorizer][msg.sender].funcNames[i].toSlice().equals(_invoke.toSlice())) {
                     return true;
                 }
             }
@@ -67,16 +83,16 @@ contract EIP20Dauth is EIP20Interface, ERCDauth {
             invokeParts[i] = invokesSlice.split(delim).toString();
 
             bool isAllowedInvoke = false;
-            for (uint j = 0; j < allowedInvokes.length; j++) {
-                if (allowedInvokes[j].toSlice().equals(invokeParts[i].toSlice())) {
+            for (uint j = 0; j < callableFuncNames.length; j++) {
+                if (callableFuncNames[j].toSlice().equals(invokeParts[i].toSlice())) {
                     isAllowedInvoke = true;
                     break;
                 }
             }
-            require(isAllowedInvoke, "Invalid invoke method");
+            require(isAllowedInvoke, "Invalid callable method");
         }
 
-        require(invokeParts.length > 0, "Invalid invoke methods");
+        require(invokeParts.length > 0, "Invalid callable methods");
 
         userAuth[msg.sender][_grantee] = AuthInfo(invokeParts, _expireAt);
 
@@ -90,7 +106,7 @@ contract EIP20Dauth is EIP20Interface, ERCDauth {
     }
 
     function revoke(address _grantee) public returns (bool success) {
-        require(userAuth[msg.sender][_grantee].invokes.length > 0, "Invalid grantee");
+        require(userAuth[msg.sender][_grantee].funcNames.length > 0, "Invalid grantee");
 
         delete userAuth[msg.sender][_grantee];
 
