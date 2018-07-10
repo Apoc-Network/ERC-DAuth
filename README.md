@@ -36,7 +36,7 @@ The inspiration of designing DAuth comes from OAuth protocol that is extensively
 
 
 **AuthInfo**
-```
+``` js
 struct AuthInfo {
     string[] funcNames;
     uint expireAt;
@@ -47,20 +47,20 @@ Required - The struct contains user authorization information
 * `expireAt`: the authorization expire timestamp in seconds
 
 **userAuth**
-```
+```  js
 mapping(address => mapping(address => AuthInfo)) userAuth;
 ```
 Required - userAuth maps (authorizer address, grantee contract address) pair to the user’s authorization AuthInfo object
 
 **callableFuncNames**
-```
+```  js
 string[] callableFuncNames;
 ```
 Required - All methods that are allowed other contracts to call
 * The callable function MUST verify the grantee’s authorization
 
 **updateCallableFuncNames**
-```
+```  js
 function updateCallableFuncNames(string _invokes) public returns (bool success);
 ```
 Optional - Update the callable function list for the client contract by the resource contract's administrator
@@ -69,7 +69,7 @@ Optional - Update the callable function list for the client contract by the reso
 * This method MUST return success or throw, no other outcomes can be possible
 
 **verify**
-```
+```  js
 function verify(address _authorizer, string _invoke) internal returns (bool success);
 ```
 Required - check the invoke method authority for the client contract
@@ -79,7 +79,7 @@ Required - check the invoke method authority for the client contract
 * This method MUST return success or throw, no other outcomes can be possible
 
 **grant**
-```
+```  js
 function grant(address _grantee, string _invokes, uint _expireAt) public returns (bool success);
 ```
 Required - delegate a client contract to access the user's resource
@@ -91,13 +91,13 @@ Required - delegate a client contract to access the user's resource
 * A successful grant MUST fire the Grant event(defined below)
 
 **regrant**
-```
+```  js
 function regrant(address _grantee, string _invokes, uint _expireAt) public returns (bool success);
 ```
 Optional - alter a client contract's delegation
 
 **revoke**
-```
+```  js
 function revoke(address _grantee) public returns (bool success);
 ```
 Required - delete a client contract's delegation
@@ -106,13 +106,13 @@ Required - delete a client contract's delegation
 * A successful revoke MUST fire the Revoke event(defined below).
 
 **Grant**
-```
+```  js
 event Grant(address _authorizer, address _grantee, string _invokes, uint _expireAt);
 ```
 * This event MUST trigger when the authorizer grant a new authorization, when grant or regrant processes successfully
 
 **Revoke**
-```
+```  js
 event Revoke(address _authorizer, address _grantee);
 ```
 ** This event MUST trigger when the authorizer revoke a specific authorization successfully
@@ -122,7 +122,7 @@ event Revoke(address _authorizer, address _grantee);
 All public or external functions that are allowed the grantee to call MUST use overload to implement two functions: The First one is the standard method that the user invokes directly, the second one is the grantee methods of the same function name with one more authorizer address parameter.
 
 Eample:
-```
+```  js
 function approve(address _spender, uint256 _value) public returns (bool success) {
     return _approve(msg.sender, _spender, _value);
 }
