@@ -1,6 +1,3 @@
-DAuth protocol: Access Delegation Standard
-=====
-
 ---
 eip:
 title: DAuth protocol: Access Delegation Standard
@@ -11,6 +8,9 @@ type: Standards Track
 category: ERC
 created: 2018-07-10
 ---
+
+DAuth protocol: Access Delegation Standard
+=====
 
 ## Simple Summary
 DAuth is a standard interface for accessing authorization delegation between smart contracts and users.
