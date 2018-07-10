@@ -121,7 +121,7 @@ event Revoke(address _authorizer, address _grantee);
 
 All public or external functions that are allowed the grantee to call MUST use overload to implement two functions: The First one is the standard method that the user invokes directly, the second one is the grantee methods of the same function name with one more authorizer address parameter.
 
-Eample:
+Example:
 ```  js
 function approve(address _spender, uint256 _value) public returns (bool success) {
     return _approve(msg.sender, _spender, _value);
