@@ -19,10 +19,10 @@ contract ERCDauth {
     string[] allowedInvokes;
 
     /// @notice check the invoke method authority for third-party contract
-    /// @param _user the user address that the third-party contract agents
+    /// @param _authorizer the user address that the third-party contract agents
     /// @param _invoke the invoke method that the third-party contract wants to access
     /// @return Whether the authority was valid or not
-    function verify(address _user, string _invoke) internal returns (bool success);
+    function verify(address _authorizer, string _invoke) internal returns (bool success);
 
     /// @notice authorize a third-pary contract to access the user's resource
     /// @param _grantee the third-party contract address
@@ -40,6 +40,6 @@ contract ERCDauth {
     /// @param _grantee the third-party contract address
     function revoke(address _grantee) public returns (bool success);
 
-    event Grant(address _user, address _grantee, string _invokes, uint _expireAt);
-    event Revoke(address _user, address _grantee);
+    event Grant(address _authorizer, address _grantee, string _invokes, uint _expireAt);
+    event Revoke(address _authorizer, address _grantee);
 }
