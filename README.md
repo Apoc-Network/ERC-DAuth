@@ -1,8 +1,8 @@
 ---
-eip: 1204
+eip: 1207
 title: DAuth protocol: Access Delegation Standard
 author: Xiaoyu Wang (@wxygeek), Bicong Wang (@Wangbicong)
-discussions-to: https://github.com/ethereum/EIPs/issues/1204
+discussions-to: https://github.com/ethereum/EIPs/issues/1207
 status: Draft
 type: Standards Track
 category: ERC
