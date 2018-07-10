@@ -115,7 +115,7 @@ event Grant(address _authorizer, address _grantee, string _invokes, uint _expire
 ```  js
 event Revoke(address _authorizer, address _grantee);
 ```
-** This event MUST trigger when the authorizer revoke a specific authorization successfully
+* This event MUST trigger when the authorizer revoke a specific authorization successfully
 
 **Callabled Resource Contract Functions**
 
