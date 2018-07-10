@@ -16,10 +16,10 @@ DAuth protocol: Access Delegation Standard
 DAuth is a standard interface for accessing authorization delegation between smart contracts and users.
 
 ## Abstract
-The DAuth protocol defines a set of standard API allowing identity delegations between smart contracts without user's private key.  Identity delegations include accessing and operating an user's data and assets contained in the delegated contracts.
+The DAuth protocol defines a set of standard API allowing identity delegations between smart contracts without the user's private key.  Identity delegations include accessing and operating a user's data and assets contained in the delegated contracts.
 
 ## Motivation
-The inspiration of designing DAuth comes from OAuth protocol that is extensively used in web applications. But unlike the centralized authorization of OAuth, DAuth works in a  distributed manner, thus providing much more reliability and generalirity.
+The inspiration for designing DAuth comes from OAuth protocol that is extensively used in web applications. But unlike the centralized authorization of OAuth, DAuth works in a  distributed manner, thus providing much more reliability and generality.
 
 ## Specification
 ![Rationale](rationale.png)
@@ -32,7 +32,7 @@ The inspiration of designing DAuth comes from OAuth protocol that is extensively
 
 **Client contract**: the grantee contract using authorization to access and operate the data
 
-**Grantee request**: the client contract call the resource contract with the authorizer authorization
+**Grantee request**: the client contract calls the resource contract with the authorizer authorization
 
 
 **AuthInfo**
@@ -84,7 +84,7 @@ function grant(address _grantee, string _invokes, uint _expireAt) public returns
 ```
 Required - delegate a client contract to access the user's resource
 * `_grantee`: the client contract address
-* `_invokes`: the callabled methods that the client contract can access. It is a string which contains all function names splitted by spaces
+* `_invokes`: the callable methods that the client contract can access. It is a string which contains all function names split by spaces
 * `_expireAt`: the authorization expire timestamp in seconds
 * return: Whether the grant is successful or not
 * This method MUST return success or throw, no other outcomes can be possible
@@ -109,7 +109,7 @@ Required - delete a client contract's delegation
 ```  js
 event Grant(address _authorizer, address _grantee, string _invokes, uint _expireAt);
 ```
-* This event MUST trigger when the authorizer grant a new authorization, when grant or regrant processes successfully
+* This event MUST trigger when the authorizer grant a new authorization when `grant` or `regrant` processes successfully
 
 **Revoke**
 ```  js
@@ -117,7 +117,7 @@ event Revoke(address _authorizer, address _grantee);
 ```
 * This event MUST trigger when the authorizer revoke a specific authorization successfully
 
-**Callabled Resource Contract Functions**
+**Callable Resource Contract Functions**
 
 All public or external functions that are allowed the grantee to call MUST use overload to implement two functions: The First one is the standard method that the user invokes directly, the second one is the grantee methods of the same function name with one more authorizer address parameter.
 
@@ -144,14 +144,14 @@ function _approve(address sender, address _spender, uint256 _value) internal ret
 
 **Current Limitations**
 
-The current design of many smart contracts only consider the user invokes the smart contract functions by themselves using private key. However, in some case, the user wants to delegate other client smart contracts to access and operate their data or assets in the resource smart contract. There isn’t a common protocol to provide a standard delegation approach.
+The current design of many smart contracts only considers the user invokes the smart contract functions by themselves using the private key. However, in some case, the user wants to delegate other client smart contracts to access and operate their data or assets in the resource smart contract. There isn’t a common protocol to provide a standard delegation approach.
 
 **Rationale**
 
-On the Ethereum platform, all storage is transparent and the `msg.sender` is reliable. Therefore, the DAuth don't need a `access_token` like OAuth. DAuth just recode the users' authorization for the specific client smart contract's address. It is simply and reliable on the Ethereum platform.
+On the Ethereum platform, all storage is transparent and the `msg.sender` is reliable. Therefore, the DAuth don't need an `access_token` like OAuth. DAuth just recodes the users' authorization for the specific client smart contract's address. It is simple and reliable on the Ethereum platform.
 
 ## Backwards Compatibility
-This EIP introduces no backwards compatibility issues. In the future, the new version protocol has to keep these interfaces.
+This EIP introduces no backward compatibility issues. In the future, the new version protocol has to keep these interfaces.
 
 ## Implementation
 Following is the DAuth Interface implementation. Furthermore, the example implementations of EIP20 Interface and ERC-DAuth Interface are also provided. Developers can easily implement their own contracts with ERC-DAuth Interface and other EIP.
