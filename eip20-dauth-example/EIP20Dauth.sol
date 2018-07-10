@@ -42,12 +42,12 @@ contract EIP20Dauth is EIP20Interface, ERCDauth {
         allowedInvokes = ["transfer", "transferFrom", "approve"]; // Set allowed invoke methods
     }
 
-    function verify(address _user, string _invoke) internal returns (bool success) {
-        require(userAuth[_user][msg.sender].invokes.length > 0, "Unauthorized");
+    function verify(address _authorizer, string _invoke) internal returns (bool success) {
+        require(userAuth[_authorizer][msg.sender].invokes.length > 0, "Unauthorized");
 
-        if (now < userAuth[_user][msg.sender].expireAt) {
-            for (uint i = 0; i < userAuth[_user][msg.sender].invokes.length; i++) {
-                if (userAuth[_user][msg.sender].invokes[i].toSlice().equals(_invoke.toSlice())) {
+        if (now < userAuth[_authorizer][msg.sender].expireAt) {
+            for (uint i = 0; i < userAuth[_authorizer][msg.sender].invokes.length; i++) {
+                if (userAuth[_authorizer][msg.sender].invokes[i].toSlice().equals(_invoke.toSlice())) {
                     return true;
                 }
             }
@@ -103,10 +103,10 @@ contract EIP20Dauth is EIP20Interface, ERCDauth {
         return _transfer(msg.sender, _to, _value);
     }
 
-    function transfer(address _to, uint256 _value, address _user) public returns (bool success) {
-        verify(_user, "transfer");
+    function transfer(address _to, uint256 _value, address _authorizer) public returns (bool success) {
+        verify(_authorizer, "transfer");
 
-        return _transfer(_user, _to, _value);
+        return _transfer(_authorizer, _to, _value);
     }
 
     function _transfer(address sender, address _to, uint256 _value) internal returns (bool success) {
@@ -121,10 +121,10 @@ contract EIP20Dauth is EIP20Interface, ERCDauth {
         return _transferFrom(msg.sender, _from, _to, _value);
     }
 
-    function transferFrom(address _from, address _to, uint256 _value, address _user) public returns (bool success) {
-        verify(_user, "transferFrom");
+    function transferFrom(address _from, address _to, uint256 _value, address _authorizer) public returns (bool success) {
+        verify(_authorizer, "transferFrom");
 
-        return _transferFrom(_user, _from, _to, _value);
+        return _transferFrom(_authorizer, _from, _to, _value);
     }
 
     function _transferFrom(address sender, address _from, address _to, uint256 _value) internal returns (bool success) {
@@ -143,10 +143,10 @@ contract EIP20Dauth is EIP20Interface, ERCDauth {
         return _approve(msg.sender, _spender, _value);
     }
 
-    function approve(address _spender, uint256 _value, address _user) public returns (bool success) {
-        verify(_user, "approve");
+    function approve(address _spender, uint256 _value, address _authorizer) public returns (bool success) {
+        verify(_authorizer, "approve");
 
-        return _approve(_user, _spender, _value);
+        return _approve(_authorizer, _spender, _value);
     }
 
     function _approve(address sender, address _spender, uint256 _value) internal returns (bool success) {
