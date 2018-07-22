@@ -151,7 +151,7 @@ The current design of many smart contracts only considers the user invokes the s
 On the Ethereum platform, all storage is transparent and the `msg.sender` is reliable. Therefore, the DAuth don't need an `access_token` like OAuth. DAuth just recodes the users' authorization for the specific client smart contract's address. It is simple and reliable on the Ethereum platform.
 
 ## Backwards Compatibility
-This EIP introduces no backward compatibility issues. In the future, the new version protocol has to keep these interfaces.
+This EIP introduces no backward compatibility issues.
 
 ## Implementation
 Following is the DAuth Interface implementation. Furthermore, the example implementations of EIP20 Interface and ERC-DAuth Interface are also provided. Developers can easily implement their own contracts with ERC-DAuth Interface and other EIP.
