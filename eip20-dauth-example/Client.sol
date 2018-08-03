@@ -35,7 +35,7 @@ contract Client {
         return eip20DAuth.transfer(_to, _value, _from);
     }
 
-    // Delegate the _from user to approve tokens
+    // Delegate the _authorizer user to approve tokens
     function approveAgent(address _authorizer, address _spender, uint256 _value) onlyOwner() public returns (bool success) {
         return eip20DAuth.approve(_spender, _value, _authorizer);
     }
